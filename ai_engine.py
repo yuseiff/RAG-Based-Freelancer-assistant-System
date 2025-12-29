@@ -4,12 +4,10 @@ import math
 import time
 from PIL import ImageDraw, ImageFont
 
-# NATIVE SDK
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold, GenerationConfig
 from google.api_core.exceptions import ResourceExhausted, InternalServerError
 
-# REAL SEARCH
 try:
     from duckduckgo_search import DDGS
 except ImportError:
@@ -26,7 +24,6 @@ class CareerAIEngine:
         # Tools
         self.tools = [self.job_search_tool]
         
-        # Force Discovery
         self.model_name = self._get_valid_model_name()
         print(f"✅ Engine Locked on: {self.model_name}")
 
@@ -43,7 +40,6 @@ class CareerAIEngine:
         except:
             return "models/gemini-1.5-flash"
 
-    # --- REAL JOB SEARCH TOOL ---
     def job_search_tool(self, query: str):
         """Searches for REAL job listings using DuckDuckGo."""
         if not DDGS:
@@ -65,7 +61,6 @@ class CareerAIEngine:
         except Exception as e:
             return f"Search failed: {str(e)}"
 
-    # --- VISION ENGINE ---
     def analyze_resume_vision(self, image):
         prompt = """
         You are a Senior Technical Recruiter grading a resume with a Red Pen.
@@ -82,7 +77,6 @@ class CareerAIEngine:
             HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
         }
 
-        # RETRY LOGIC
         max_retries = 3
         last_error = "Unknown Error"
         
@@ -198,7 +192,6 @@ class CareerAIEngine:
                 draw.text((x+adj, y+adj2), text, font=font, fill=outline_color)
         draw.text((x, y), text, font=font, fill=text_color)
 
-    # --- CHAT ENGINE (UPDATED) ---
     def start_chat_session(self, resume_text):
         system_instruction = f"""You are an expert Career Consultant.
         RESUME CONTEXT:
@@ -212,7 +205,6 @@ class CareerAIEngine:
         2. **JOB SEARCH:** Use job_search_tool ONLY if specifically asked for listings.
         """
         
-        # INCREASED TEMPERATURE TO 0.7
         generation_config = GenerationConfig(
             temperature=0.7,
             max_output_tokens=4000,
