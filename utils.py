@@ -18,7 +18,13 @@ def extract_text_from_pdf(file_bytes):
         for page in pdf_reader.pages:
             content = page.extract_text()
             if content: text += content + "\n"
-        return text
+            
+        # --- CRITICAL FIX: SANITIZE TEXT ---
+        # This removes "surrogate" characters that crash the Google API
+        # by forcing a clean UTF-8 encoding/decoding cycle.
+        clean_text = text.encode('utf-8', 'ignore').decode('utf-8')
+        return clean_text
+
     except Exception as e:
         print(f"Text Error: {e}")
         return ""
