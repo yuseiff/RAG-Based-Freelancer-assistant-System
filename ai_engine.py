@@ -6,7 +6,7 @@ from PIL import ImageDraw, ImageFont
 
 # NATIVE SDK
 import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+from google.generativeai.types import HarmCategory, HarmBlockThreshold, GenerationConfig
 from google.api_core.exceptions import ResourceExhausted, InternalServerError
 
 # REAL SEARCH
@@ -52,13 +52,11 @@ class CareerAIEngine:
         print(f"🔎 Searching web for: {query}...")
         try:
             with DDGS() as ddgs:
-                # Search for recent results (past month)
                 results = list(ddgs.text(f"{query} jobs hiring now", max_results=5, timelimit='m'))
                 
             if not results:
                 return "No specific listings found right now."
                 
-            # Format results
             formatted = "Here are some real listings found:\n"
             for i, res in enumerate(results, 1):
                 formatted += f"{i}. {res['title']} - {res['href']}\n"
@@ -200,20 +198,31 @@ class CareerAIEngine:
                 draw.text((x+adj, y+adj2), text, font=font, fill=outline_color)
         draw.text((x, y), text, font=font, fill=text_color)
 
-    # --- CHAT ENGINE ---
+    # --- CHAT ENGINE (UPDATED) ---
     def start_chat_session(self, resume_text):
         system_instruction = f"""You are an expert Career Consultant.
         RESUME CONTEXT:
         {resume_text}
         
         CRITICAL INSTRUCTIONS:
-        1. **SALARY:** Do NOT use tools. Use internal knowledge based on user location.
+        1. **SALARY:** You MUST provide a salary estimate based on your internal knowledge of the market (Egypt or Global). 
+           - Do NOT refuse to answer. 
+           - Do NOT say "I cannot provide specific estimates."
+           - Give a realistic range (e.g., "In Egypt, this role typically pays X to Y EGP").
         2. **JOB SEARCH:** Use job_search_tool ONLY if specifically asked for listings.
         """
+        
+        # INCREASED TEMPERATURE TO 0.7
+        generation_config = GenerationConfig(
+            temperature=0.7,
+            max_output_tokens=4000,
+        )
+
         model = genai.GenerativeModel(
             model_name=self.model_name,
             tools=self.tools,
-            system_instruction=system_instruction
+            system_instruction=system_instruction,
+            generation_config=generation_config
         )
         return model.start_chat(enable_automatic_function_calling=True)
 
