@@ -2,7 +2,9 @@ streamlit
 python-dotenv
 langchain
 langchain-community
-langchain-groq
-langchain-huggingface
+langchain-google-genai
+google-generativeai
 faiss-cpu
 PyPDF2
+pdf2image
+Pillow
