@@ -5,9 +5,9 @@ from ai_engine import CareerAIEngine
 from utils import convert_pdf_to_image, extract_text_from_pdf
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="AI Career Platform", layout="wide", page_icon="🚀")
+st.set_page_config(page_title="RAG-Based Freelancer Assistant", layout="wide", page_icon="🚀")
 load_dotenv()
-st.title("🎓 Smart Freelance Platform")
+st.title("🤖 RAG-Based Freelancer Assistant")
 
 # --- VALIDATION ---
 api_key = os.getenv("GOOGLE_API_KEY")
